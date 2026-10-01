@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex Critical Infrastructure | Agentic AI Systems Architecture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --bg-surface: #0f1422;
+      --bg-surface-elevated: #161e31;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(6, 182, 212, 0.3);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --cyan-glow: #06b6d4;
+      --purple-glow: #a855f7;
+      --emerald-glow: #10b981;
+      --amber-glow: #f59e0b;
+      --rose-glow: #f43f5e;
+      --blue-glow: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .ambient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 85% 25%, rgba(168, 85, 247, 0.07) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px 24px 80px 24px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 28px;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .badge-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .badge.cyan { border-color: rgba(6, 182, 212, 0.3); color: var(--cyan-glow); background: rgba(6, 182, 212, 0.06); }
+    .badge.purple { border-color: rgba(168, 85, 247, 0.3); color: var(--purple-glow); background: rgba(168, 85, 247, 0.06); }
+    .badge.emerald { border-color: rgba(16, 185, 129, 0.3); color: var(--emerald-glow); background: rgba(16, 185, 129, 0.06); }
+    .badge.amber { border-color: rgba(245, 158, 11, 0.3); color: var(--amber-glow); background: rgba(245, 158, 11, 0.06); }
+
+    .header-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 960px;
+      margin-top: 6px;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .stat-val {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tab-nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      color: #ffffff;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-accent);
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.12);
+    }
+
+    .panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .mermaid-box {
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 28px 20px;
+      overflow-x: auto;
+      text-align: center;
+      margin: 16px 0;
+    }
+
+    .module-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .module-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--cyan-glow);
+    }
+
+    .module-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .module-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .module-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+    }
+
+    .module-desc {
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .module-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-dim);
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      padding-top: 12px;
+    }
+
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--cyan-glow);
+      text-decoration: none;
+    }
+
+    .btn-link:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding-top: 24px;
+      margin-top: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 20px 16px 60px 16px; }
+      h1 { font-size: 24px; }
+      .header-title-row { flex-direction: column; align-items: flex-start; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .tab-nav { gap: 4px; }
+      .tab-btn { padding: 10px 14px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg"></div>
+  <div class="container">
+
+    <!-- Header -->
+    <header>
+      <div class="badge-bar">
+        <span class="badge cyan">Apex Critical Infrastructure</span>
+        <span class="badge purple">Agentic AI Systems</span>
+        <span class="badge emerald">16 Modules</span>
+        <span class="badge amber">4 Domains</span>
+      </div>
+      <div class="header-title-row">
+        <div>
+          <h1>Apex Critical Infrastructure</h1>
+          <p class="subtitle">Agentic AI systems for critical infrastructure: smart grid balancing, renewable energy forecasting, autonomous data center operations, self-healing telecom networks, and defense-grade cybersecurity with autonomous incident response.</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Modules</div>
+        <div class="stat-val" style="color: var(--cyan-glow);">16</div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Python source files</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Infrastructure Domains</div>
+        <div class="stat-val" style="color: var(--purple-glow);">4</div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Energy, DC, Telecom, Defense</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Architecture Pattern</div>
+        <div class="stat-val" style="color: var(--emerald-glow);">Agentic</div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">AI-driven autonomous ops</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Simulation Engines</div>
+        <div class="stat-val" style="color: var(--amber-glow);">2</div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Grid + Network real-time</div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('tab-energy')">⚡ Energy & Power</button>
+      <button class="tab-btn" onclick="switchTab('tab-datacenter')">🏢 Data Centers</button>
+      <button class="tab-btn" onclick="switchTab('tab-telecom')">📡 Telecom & Networks</button>
+      <button class="tab-btn" onclick="switchTab('tab-defense')">🛡️ Defense & Security</button>
+    </div>
+
+    <!-- TAB 1: Energy & Power -->
+    <div id="tab-energy" class="panel active">
+      <div class="glass-card">
+        <div class="card-title">
+          <span>⚡ Energy & Power: Smart Grid, Renewables & Predictive Maintenance</span>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">
+          Autonomous grid balancing with demand forecasting, frequency regulation, and voltage control. Solar/wind forecasting with grid storage optimization and curtailment. Equipment failure prediction and anomaly detection for critical infrastructure maintenance.
+        </p>
+
+        <div class="mermaid-box">
+          <pre class="mermaid">
+flowchart TD
+    subgraph SmartGrid["Smart Grid Control"]
+        SGC["SmartGridController<br/>Autonomous Grid Balancing"]
+        GB["GridBalancer"]
+        FR["FrequencyRegulator"]
+        VC["VoltageController"]
+        DF["Demand Forecaster"]
+    end
+
+    subgraph Renewables["Renewables & Storage"]
+        SF["Solar Forecaster<br/>ClearSky Model"]
+        WF["Wind Forecaster<br/>Power Curve Model"]
+        SO["Storage Optimizer"]
+        CM["Curtailment Manager"]
+    end
+
+    subgraph PredictiveMaint["Predictive Maintenance"]
+        FPD["Failure Predictor<br/>Weibull Model"]
+        AD["Anomaly Detector<br/>Statistical"]
+        MS["Maintenance Scheduler"]
+    end
+
+    subgraph Sim["Simulation"]
+        GS["GridSimulator<br/>Real-Time Engine"]
+    end
+
+    SGC --> GB
+    SGC --> FR
+    SGC --> VC
+    SGC --> DF
+    SF --> SO
+    WF --> SO
+    SO --> CM
+    FPD --> MS
+    AD --> MS
+    GS --> SGC
+    GS --> SF
+    GS --> FPD
+          </pre>
+        </div>
+
+        <div class="grid-2" style="margin-top: 24px;">
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">smart_grid.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Autonomous grid balancing, demand forecasting, frequency regulation, and voltage control. Manages buses, generators, loads, transformers, and capacitor banks with per-unit voltage control.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 1,369</span>
+              <span class="badge cyan">Energy</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">renewables.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Solar/wind forecasting using clear-sky and power-curve models. Grid storage optimization with charge/discharge scheduling. Curtailment management for over-generation scenarios.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 1,330</span>
+              <span class="badge cyan">Energy</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">predictive_maintenance.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Equipment failure prediction using Weibull statistical models. Statistical anomaly detection from sensor readings. Maintenance scheduling with priority-based task management.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 1,476</span>
+              <span class="badge cyan">Energy</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">grid_simulator.py</span>
+                <span class="module-tag">Simulator</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Real-time grid simulation integrating smart grid, renewables, and predictive maintenance. Agentic AI decision-making for what-if analysis and scenario testing.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 883</span>
+              <span class="badge cyan">Energy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Data Centers -->
+    <div id="tab-datacenter" class="panel">
+      <div class="glass-card">
+        <div class="card-title">
+          <span>🏢 Data Centers: DC Operations, Edge Computing, Cooling & Power</span>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">
+          Autonomous data center operations with cooling optimization, power management, and capacity planning. Distributed AI inference at the edge with workload orchestration. HVAC, liquid cooling, and free cooling with thermal modeling. UPS, generator, and renewable integration with PUE optimization.
+        </p>
+
+        <div class="mermaid-box">
+          <pre class="mermaid">
+flowchart TD
+    subgraph DCOps["DC Operations"]
+        DCO["DCOpsController<br/>Autonomous DC Ops"]
+        CP["Capacity Planner"]
+        OM["Orchestration Manager"]
+    end
+
+    subgraph Cooling["Cooling Optimization"]
+        HVAC["HVAC Controller"]
+        LC["Liquid Cooling"]
+        FC["Free Cooling"]
+        TM["Thermal Modeler"]
+    end
+
+    subgraph Power["Power Management"]
+        UPS["UPS Manager"]
+        GEN["Generator Control"]
+        PUE["PUE Optimizer"]
+        RI["Renewable Integration"]
+    end
+
+    subgraph Edge["Edge Computing"]
+        WO["Workload Orchestrator"]
+        IE["Inference Engine"]
+        ENM["Edge Node Manager"]
+    end
+
+    DCO --> CP
+    DCO --> OM
+    DCO --> HVAC
+    DCO --> UPS
+    HVAC --> LC
+    HVAC --> FC
+    HVAC --> TM
+    UPS --> GEN
+    UPS --> PUE
+    PUE --> RI
+    OM --> WO
+    WO --> IE
+    WO --> ENM
+          </pre>
+        </div>
+
+        <div class="grid-2" style="margin-top: 24px;">
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">dc_operations.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Autonomous DC operations engine providing cooling optimization, power management, and capacity planning. Integrates with Data Center Commander, Apex_ULL, ApexGraphSwarm, and GRC_Claw.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 1,531</span>
+              <span class="badge purple">Data Center</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">edge_computing.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Distributed AI inference, low-latency edge deployment, and workload orchestration. Manages up to 10,000 edge nodes with auto-scaling, failover, and heartbeat monitoring.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 1,309</span>
+              <span class="badge purple">Data Center</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">cooling_optimization.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">HVAC optimization, liquid cooling control, free cooling, and thermal modeling. Uses Stefan-Boltzmann radiation, airflow dynamics, and thermal mass modeling for data center environments.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 1,409</span>
+              <span class="badge purple">Data Center</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">power_management.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">UPS management, generator control, renewable integration, and PUE optimization. Manages battery systems, fuel levels, and power factor correction for data center power systems.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 1,770</span>
+              <span class="badge purple">Data Center</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Telecom & Networks -->
+    <div id="tab-telecom" class="panel">
+      <div class="glass-card">
+        <div class="card-title">
+          <span>📡 Telecom & Networks: Network Ops, Spectrum & Edge AI</span>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">
+          Self-healing networks with predictive maintenance and fault detection. Dynamic spectrum allocation with interference detection and optimization. Distributed AI at the edge with MEC orchestration and low-latency inference.
+        </p>
+
+        <div class="mermaid-box">
+          <pre class="mermaid">
+flowchart TD
+    subgraph NetOps["Network Operations"]
+        NO["NetworkOperations<br/>Orchestrator"]
+        SHE["Self-Healing Engine"]
+        FD["Fault Detector"]
+        PM["Predictive Maintenance"]
+    end
+
+    subgraph Spectrum["Spectrum Management"]
+        DSA["Dynamic Spectrum Allocator"]
+        ID["Interference Detector"]
+        SO["Spectrum Optimizer"]
+    end
+
+    subgraph EdgeAI["Edge AI"]
+        MEC["MEC Orchestrator"]
+        MR["Model Registry"]
+        WS["Workload Scheduler"]
+        IE["Inference Engine"]
+    end
+
+    subgraph Sim["Simulation"]
+        NS["NetworkSimulator<br/>Real-Time Engine"]
+    end
+
+    NO --> SHE
+    NO --> FD
+    NO --> PM
+    DSA --> ID
+    DSA --> SO
+    MEC --> MR
+    MEC --> WS
+    WS --> IE
+    NS --> NO
+    NS --> DSA
+    NS --> MEC
+          </pre>
+        </div>
+
+        <div class="grid-2" style="margin-top: 24px;">
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">network_operations.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Self-healing networks, predictive maintenance, and fault detection. Manages network topology, detects anomalies from telemetry streams, and automatically remediates detected faults.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 1,963</span>
+              <span class="badge emerald">Telecom</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">spectrum_management.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Dynamic spectrum allocation, interference detection, and spectrum optimization. Manages frequency bands, tracks allocations, and uses constraint solving for optimal spectrum utilization.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 1,350</span>
+              <span class="badge emerald">Telecom</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">edge_ai.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Distributed AI at the edge, MEC orchestration, and low-latency inference. Manages edge nodes, model registry, and workload scheduling across edge infrastructure.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 1,530</span>
+              <span class="badge emerald">Telecom</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">network_simulator.py</span>
+                <span class="module-tag">Simulator</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Real-time network simulation with agentic AI decision-making. Provides simulation configuration, event generation, metrics collection, and scenario testing for telecom infrastructure.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 2,014</span>
+              <span class="badge emerald">Telecom</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Defense & Security -->
+    <div id="tab-defense" class="panel">
+      <div class="glass-card">
+        <div class="card-title">
+          <span>🛡️ Defense & Security: Cybersecurity, C2, Threat Intel & Incident Response</span>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">
+          Real-time threat detection with autonomous response and incident management. Decision support with situational awareness and resource allocation. Proactive threat hunting with IOC management and attack surface analysis. Automated incident response with forensics and recovery.
+        </p>
+
+        <div class="mermaid-box">
+          <pre class="mermaid">
+flowchart TD
+    subgraph Cyber["Cybersecurity"]
+        TD["Threat Detector"]
+        ARE["Autonomous Response Engine"]
+        IM["Incident Manager"]
+    end
+
+    subgraph C2["Command & Control"]
+        DSE["Decision Support Engine"]
+        SA["Situational Awareness"]
+        RA["Resource Allocator"]
+    end
+
+    subgraph ThreatIntel["Threat Intelligence"]
+        TH["Threat Hunter"]
+        IOC["IOC Manager"]
+        ASA["Attack Surface Analyzer"]
+    end
+
+    subgraph Incident["Incident Response"]
+        AR["Automated Responder"]
+        FE["Forensics Engine"]
+        RM["Recovery Manager"]
+    end
+
+    TD --> ARE
+    ARE --> IM
+    DSE --> SA
+    DSE --> RA
+    TH --> IOC
+    TH --> ASA
+    AR --> FE
+    AR --> RM
+    IM --> AR
+    IOC --> TD
+    ASA --> DSE
+          </pre>
+        </div>
+
+        <div class="grid-2" style="margin-top: 24px;">
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">cybersecurity.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Threat detection, autonomous response, and incident management. Real-time threat detection from security events with severity classification and automated response orchestration.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 712</span>
+              <span class="badge amber">Defense</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">command_control.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Decision support, situational awareness, and resource allocation. Multi-criteria decision analysis for C2 with real-time operational picture aggregation and dynamic resource optimization.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 573</span>
+              <span class="badge amber">Defense</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">threat_intelligence.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Threat hunting, IOC management, and attack surface analysis. Proactive threat hunting across telemetry with IOC lifecycle management and continuous attack surface assessment.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 695</span>
+              <span class="badge amber">Defense</span>
+            </div>
+          </div>
+          <div class="module-card">
+            <div>
+              <div class="module-header">
+                <span class="module-name">incident_response.py</span>
+                <span class="module-tag">Core</span>
+              </div>
+              <p class="module-desc" style="margin-top: 10px;">Automated incident response, forensics, and recovery. Playbook-driven automated response with digital forensics collection and system recovery orchestration.</p>
+            </div>
+            <div class="module-meta">
+              <span>Lines: 721</span>
+              <span class="badge amber">Defense</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div>
+        <strong>Apex Critical Infrastructure</strong> &copy; 2026. All Rights Reserved.
+      </div>
+      <div>
+        Agentic AI Systems for Critical Infrastructure
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      securityLevel: 'loose',
+      themeVariables: {
+        darkMode: true,
+        background: '#090d16',
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#06b6d4',
+        lineColor: '#38bdf8',
+        secondaryColor: '#0f172a',
+        tertiaryColor: '#1e1b4b'
+      }
+    });
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+
+      const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick')?.includes(tabId));
+      if (targetBtn) {
+        targetBtn.classList.add('active');
+      } else if (window.event && window.event.currentTarget) {
+        window.event.currentTarget.classList.add('active');
+      }
+
+      const targetPanel = document.getElementById(tabId);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
