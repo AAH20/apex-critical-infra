@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "apex-critical-infra"
+version = "0.1.0"
+description = "Agentic AI Systems for Critical Infrastructure"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Ahmed Hassan", email = "ahmed.a.hassan@outlook.com"}
+]
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["apex_critical_infra*"]
